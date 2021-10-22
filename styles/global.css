@@ -12,6 +12,16 @@ body {
   color: var(--color-text-primary);
   background-color: var(--color-bg-primary);
   transition: color var(--quick-ease), background-color var(--quick-ease);
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+}
+
+button {
+  -webkit-app-region: no-drag;
+}
+
+input {
+  -webkit-app-region: no-drag;
 }
 
 /* Set global colour values. Taken from GitHub Markdown CSS. */
