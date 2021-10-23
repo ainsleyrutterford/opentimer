@@ -2,6 +2,7 @@ import type { NextPage } from "next";
 import React, { useEffect, useState } from "react";
 
 import { DarkmodeToggle } from "../components/darkmode";
+import { Timer } from "../utils/timer";
 
 const GBA_FPS = 59.7275;
 const GBA_FRAMERATE = 1000 / GBA_FPS;
@@ -49,6 +50,13 @@ const Home: NextPage = () => {
   const [targetFrame, setTargetFrame] = useState(1000);
   const [frameHit, setFrameHit] = useState(0);
   const [time, setTime] = useState(0);
+  const [timer, setTimer] = useState<Timer>();
+  const [timerStarted, setTimerStarted] = useState(false);
+
+  useEffect(() => {
+    const audio = new Audio("beep.wav");
+    setTimer(new Timer(() => audio.play(), 500));
+  }, []);
 
   useEffect(() => {
     setTime(targetFrame * GBA_FRAMERATE + lag);
@@ -87,9 +95,25 @@ const Home: NextPage = () => {
       >
         Update
       </button>
-      <button onClick={() => setTime(targetFrame * GBA_FRAMERATE + lag)}>
-        Start
-      </button>
+      {!timerStarted ? (
+        <button
+          onClick={() => {
+            timer?.start();
+            setTimerStarted(true);
+          }}
+        >
+          Start
+        </button>
+      ) : (
+        <button
+          onClick={() => {
+            timer?.stop();
+            setTimerStarted(false);
+          }}
+        >
+          Stop
+        </button>
+      )}
     </>
   );
 };
