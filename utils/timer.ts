@@ -1,19 +1,30 @@
-// Based off of https://github.com/Aaronik/accurate_timer
+type Callback = () => void;
+type TickCallback = (totalElapsedTime?: number) => void;
 
-export class Timer {
-  callback: () => void;
+/**
+ * A timer that will call a provided callback function at the provided timestamps.
+ * It can optionally also call a callback function at each tick of the timer.
+ */
+export class CountdownTimer {
+  callback: Callback;
 
-  interval: number;
+  tickCallback?: TickCallback;
 
-  raf: ((callback: FrameRequestCallback) => number) | undefined;
+  timestamps: number[];
+
+  totalElapsedTime: number;
+
+  raf: (callback: FrameRequestCallback) => number;
 
   lastTimestamp: number;
 
   animationFrame?: number;
 
-  constructor(callback: () => void, interval: number) {
+  constructor(callback: Callback, timestamps: number[], tickCallback?: TickCallback) {
     this.callback = callback;
-    this.interval = interval;
+    this.tickCallback = tickCallback;
+    this.timestamps = timestamps;
+    this.totalElapsedTime = 0;
     this.raf = window.requestAnimationFrame;
     this.lastTimestamp = performance.now();
   }
@@ -21,8 +32,12 @@ export class Timer {
   start = () => {
     this.stop();
 
-    this.lastTimestamp = performance.now();
-    this.raf?.call(window, this.step);
+    // need to setup timestamps from now. if someone restarts timer we need to re setup timestamps.
+
+    if (this.timestamps.length > 0) {
+      this.lastTimestamp = performance.now();
+      this.raf?.call(window, this.tick);
+    }
   };
 
   stop = () => {
@@ -30,16 +45,27 @@ export class Timer {
       window.cancelAnimationFrame(this.animationFrame);
       delete this.animationFrame;
     }
+    this.totalElapsedTime = 0;
   };
 
-  step = () => {
+  tick = () => {
     const elapsedTime = performance.now() - this.lastTimestamp;
+    this.totalElapsedTime += elapsedTime;
 
-    if (elapsedTime >= this.interval) {
-      this.lastTimestamp = this.lastTimestamp + this.interval;
+    if (this.tickCallback) this.tickCallback(this.totalElapsedTime);
+
+    if (elapsedTime >= this.timestamps[0]) {
       this.callback();
+      this.timestamps.pop(); // don't use pop, use an index instead as when we press stop we need to go back to the previous timestamp.
+
+      if (this.timestamps.length > 0) {
+        this.stop();
+        return;
+      }
+      
+      this.lastTimestamp = performance.now();
     }
 
-    this.animationFrame = this.raf?.call(window, this.step);
+    this.animationFrame = this.raf?.call(window, this.tick);
   };
 }
