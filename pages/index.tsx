@@ -57,7 +57,7 @@ const Home: NextPage = () => {
     const audio = new Audio("beep.wav");
     const countdownTimer = new CountdownTimer(
       () => console.log("callback"), 
-      [1000000000], 
+      [3000, 6000], 
       (elapsedTime) => { if (elapsedTime) setTime(elapsedTime) })
     setTimer(countdownTimer);
   }, []);

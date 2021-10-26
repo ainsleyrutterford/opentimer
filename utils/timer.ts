@@ -16,7 +16,9 @@ export class CountdownTimer {
 
   raf: (callback: FrameRequestCallback) => number;
 
-  lastTimestamp: number;
+  firstTimestamp: number;
+
+  currentTimestampIndex: number;
 
   animationFrame?: number;
 
@@ -26,7 +28,8 @@ export class CountdownTimer {
     this.timestamps = timestamps;
     this.totalElapsedTime = 0;
     this.raf = window.requestAnimationFrame;
-    this.lastTimestamp = performance.now();
+    this.firstTimestamp = 0;
+    this.currentTimestampIndex = 0;
   }
 
   start = () => {
@@ -35,7 +38,8 @@ export class CountdownTimer {
     // need to setup timestamps from now. if someone restarts timer we need to re setup timestamps.
 
     if (this.timestamps.length > 0) {
-      this.lastTimestamp = performance.now();
+      this.firstTimestamp = performance.now();
+      this.currentTimestampIndex = 0;
       this.raf?.call(window, this.tick);
     }
   };
@@ -49,21 +53,18 @@ export class CountdownTimer {
   };
 
   tick = () => {
-    const elapsedTime = performance.now() - this.lastTimestamp;
-    this.totalElapsedTime += elapsedTime;
+    this.totalElapsedTime = performance.now() - this.firstTimestamp;
 
-    if (this.tickCallback) this.tickCallback(this.totalElapsedTime);
+    this.tickCallback?.(this.totalElapsedTime);
 
-    if (elapsedTime >= this.timestamps[0]) {
+    if (this.totalElapsedTime >= (this.timestamps[this.currentTimestampIndex])) {
       this.callback();
-      this.timestamps.pop(); // don't use pop, use an index instead as when we press stop we need to go back to the previous timestamp.
-
-      if (this.timestamps.length > 0) {
+      
+      this.currentTimestampIndex += 1;
+      if (this.currentTimestampIndex >= this.timestamps.length) {
         this.stop();
         return;
       }
-      
-      this.lastTimestamp = performance.now();
     }
 
     this.animationFrame = this.raf?.call(window, this.tick);
