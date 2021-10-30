@@ -1,5 +1,5 @@
 type Callback = () => void;
-type TickCallback = (totalElapsedTime?: number) => void;
+type TickCallback = (totalElapsedTime: number) => void;
 
 /**
  * A timer that will call a provided callback function at the provided timestamps.
@@ -10,35 +10,45 @@ export class CountdownTimer {
 
   tickCallback?: TickCallback;
 
+  stopCallback?: Callback;
+
   timestamps: number[];
 
   totalElapsedTime: number;
 
   raf: (callback: FrameRequestCallback) => number;
 
-  firstTimestamp: number;
+  startTimestamp: number;
 
   currentTimestampIndex: number;
 
   animationFrame?: number;
 
-  constructor(callback: Callback, timestamps: number[], tickCallback?: TickCallback) {
+  constructor(
+    callback: Callback,
+    tickCallback?: TickCallback,
+    stopCallback?: Callback,
+    timestamps?: number[]
+  ) {
     this.callback = callback;
     this.tickCallback = tickCallback;
-    this.timestamps = timestamps;
+    this.stopCallback = stopCallback;
+    this.timestamps = timestamps || [];
     this.totalElapsedTime = 0;
     this.raf = window.requestAnimationFrame;
-    this.firstTimestamp = 0;
+    this.startTimestamp = 0;
     this.currentTimestampIndex = 0;
   }
+
+  setTimestamps = (timestamps: number[]) => {
+    this.timestamps = timestamps;
+  };
 
   start = () => {
     this.stop();
 
-    // need to setup timestamps from now. if someone restarts timer we need to re setup timestamps.
-
     if (this.timestamps.length > 0) {
-      this.firstTimestamp = performance.now();
+      this.startTimestamp = performance.now();
       this.currentTimestampIndex = 0;
       this.raf?.call(window, this.tick);
     }
@@ -50,16 +60,17 @@ export class CountdownTimer {
       delete this.animationFrame;
     }
     this.totalElapsedTime = 0;
+    this.stopCallback?.();
   };
 
   tick = () => {
-    this.totalElapsedTime = performance.now() - this.firstTimestamp;
+    this.totalElapsedTime = performance.now() - this.startTimestamp;
 
     this.tickCallback?.(this.totalElapsedTime);
 
-    if (this.totalElapsedTime >= (this.timestamps[this.currentTimestampIndex])) {
+    if (this.totalElapsedTime >= this.timestamps[this.currentTimestampIndex]) {
       this.callback();
-      
+
       this.currentTimestampIndex += 1;
       if (this.currentTimestampIndex >= this.timestamps.length) {
         this.stop();
