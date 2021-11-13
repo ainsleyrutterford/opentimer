@@ -1,13 +1,29 @@
+import { Howl } from "howler";
 import type { NextPage } from "next";
 import React, { useEffect, useState } from "react";
 
 import { DarkmodeToggle } from "../components/darkmode";
+import { CountdownTimer } from "../utils/timer";
 
 const GBA_FPS = 59.7275;
 const GBA_FRAMERATE = 1000 / GBA_FPS;
 
 // const NDS_GBA_FPS = 59.6555;
 // const NDS_GBA_FRAMERATE = 1000 / NDS_GBA_FPS;
+
+const calculateTimestamps = (
+  time: number,
+  beeps: number,
+  beepDistance: number
+) => {
+  const timestamps = [time];
+
+  for (let i = 0; i < beeps - 1; i++) {
+    timestamps.push(timestamps[i] - beepDistance);
+  }
+
+  return timestamps.reverse().filter((timestamp) => timestamp >= 0);
+};
 
 type LabelledNumberInputProps = {
   label: string;
@@ -49,16 +65,47 @@ const Home: NextPage = () => {
   const [targetFrame, setTargetFrame] = useState(1000);
   const [frameHit, setFrameHit] = useState(0);
   const [time, setTime] = useState(0);
+  const [timeElapsed, setTimeElapsed] = useState(0);
+  const [timer, setTimer] = useState<CountdownTimer>();
+  const [timerStarted, setTimerStarted] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [beeps, setBeeps] = useState(5);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [beepDistance, setBeepDistance] = useState(500);
+
+  useEffect(() => {
+    const audio = new Howl({ src: ["beep.wav"] });
+    const countdownTimer = new CountdownTimer(
+      () => audio.play(),
+      (elapsedTime) => setTimeElapsed(elapsedTime),
+      () => {
+        setTimerStarted(false);
+        setTimeElapsed(time);
+      }
+    );
+    setTimer(countdownTimer);
+  }, []);
+
+  useEffect(() => {
+    const timestamps = calculateTimestamps(time, beeps, beepDistance);
+    timer?.setTimestamps(timestamps);
+  }, [time, timer, beeps, beepDistance]);
 
   useEffect(() => {
     setTime(targetFrame * GBA_FRAMERATE + lag);
-  }, [targetFrame, lag]);
+  }, [lag, targetFrame]);
+
+  useEffect(() => {
+    setTimeElapsed(0);
+    timer?.stop();
+    setTimerStarted(false);
+  }, [lag, preTimer, targetFrame, frameHit]);
 
   return (
     <>
       <DarkmodeToggle />
       <br />
-      Time (s): {`${(time / 1000).toFixed(2)}`} <br />
+      Time (s): {`${((time - timeElapsed) / 1000).toFixed(2)}`} <br />
       <br />
       <LabelledNumberInput label="Lag (ms)" state={lag} setState={setLag} />
       <LabelledNumberInput
@@ -87,9 +134,25 @@ const Home: NextPage = () => {
       >
         Update
       </button>
-      <button onClick={() => setTime(targetFrame * GBA_FRAMERATE + lag)}>
-        Start
-      </button>
+      {!timerStarted ? (
+        <button
+          onClick={() => {
+            timer?.start();
+            setTimerStarted(true);
+          }}
+        >
+          Start
+        </button>
+      ) : (
+        <button
+          onClick={() => {
+            timer?.stop();
+            setTimerStarted(false);
+          }}
+        >
+          Stop
+        </button>
+      )}
     </>
   );
 };
