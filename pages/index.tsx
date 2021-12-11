@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Howl } from "howler";
 import type { NextPage } from "next";
 import React, { useEffect, useState } from "react";
@@ -60,21 +61,31 @@ const LabelledNumberInput = ({
 };
 
 const Home: NextPage = () => {
+  // Input field states
   const [lag, setLag] = useState(0);
-  const [preTimer, setPreTimer] = useState(5000);
+  const [preTimerInput, setPreTimerInput] = useState(5000);
   const [targetFrame, setTargetFrame] = useState(1000);
   const [frameHit, setFrameHit] = useState(0);
+
+  // Pre timer states
+  const [preTimeElapsed, setPreTimeElapsed] = useState(0);
+  const [preTimer, setPreTimer] = useState<CountdownTimer>();
+  const [preTimerStarted, setPreTimerStarted] = useState(false);
+
+  // Countdown timer states
   const [time, setTime] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [timer, setTimer] = useState<CountdownTimer>();
   const [timerStarted, setTimerStarted] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  // Beep states
   const [beeps, setBeeps] = useState(5);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [beepDistance, setBeepDistance] = useState(500);
 
+  // Create countdown timer
   useEffect(() => {
     const audio = new Howl({ src: ["beep.wav"] });
+
     const countdownTimer = new CountdownTimer(
       () => audio.play(),
       (elapsedTime) => setTimeElapsed(elapsedTime),
@@ -83,35 +94,74 @@ const Home: NextPage = () => {
         setTimeElapsed(time);
       }
     );
+
     setTimer(countdownTimer);
   }, []);
 
+  // Create pre-time timer
+  useEffect(() => {
+    const audio = new Howl({ src: ["beep.wav"] });
+
+    const preTimerObject = new CountdownTimer(
+      () => audio.play(),
+      (elapsedTime) => setPreTimeElapsed(elapsedTime),
+      () => {
+        setPreTimerStarted(false);
+        setPreTimeElapsed(0);
+        timer?.start();
+        setTimerStarted(true);
+      }
+    );
+
+    setPreTimer(preTimerObject);
+  }, [timer]);
+
+  // Set timer beeps
   useEffect(() => {
     const timestamps = calculateTimestamps(time, beeps, beepDistance);
     timer?.setTimestamps(timestamps);
   }, [time, timer, beeps, beepDistance]);
 
+  // Set pre-timer beeps
   useEffect(() => {
-    setTime(targetFrame * GBA_FRAMERATE + lag);
+    const timestamps = calculateTimestamps(preTimerInput, beeps, beepDistance);
+    preTimer?.setTimestamps(timestamps);
+  }, [preTimerInput, preTimer, beeps, beepDistance]);
+
+  // Update the time if target frame or lag are updated
+  useEffect(() => {
+    setTime(Math.max(0, targetFrame * GBA_FRAMERATE + lag));
   }, [lag, targetFrame]);
 
+  // Stop both timers if any of the inputs are updated
   useEffect(() => {
-    setTimeElapsed(0);
     timer?.stop();
     setTimerStarted(false);
-  }, [lag, preTimer, targetFrame, frameHit]);
+
+    setPreTimeElapsed(0);
+    preTimer?.stop(() => {
+      setPreTimerStarted(false);
+      setPreTimeElapsed(0);
+    });
+    setPreTimerStarted(false);
+  }, [lag, preTimerInput, targetFrame, frameHit]);
 
   return (
     <>
       <DarkmodeToggle />
+      <br />
+      <br />
+      Pre Timer (s): {`${((preTimerInput - preTimeElapsed) / 1000).toFixed(
+        2
+      )}`}{" "}
       <br />
       Time (s): {`${((time - timeElapsed) / 1000).toFixed(2)}`} <br />
       <br />
       <LabelledNumberInput label="Lag (ms)" state={lag} setState={setLag} />
       <LabelledNumberInput
         label="Pre-timer (ms)"
-        state={preTimer}
-        setState={setPreTimer}
+        state={preTimerInput}
+        setState={setPreTimerInput}
       />
       <LabelledNumberInput
         label="Target frame"
@@ -134,23 +184,28 @@ const Home: NextPage = () => {
       >
         Update
       </button>
-      {!timerStarted ? (
+      {timerStarted || preTimerStarted ? (
         <button
           onClick={() => {
-            timer?.start();
-            setTimerStarted(true);
-          }}
-        >
-          Start
-        </button>
-      ) : (
-        <button
-          onClick={() => {
+            preTimer?.stop(() => {
+              setPreTimerStarted(false);
+              setPreTimeElapsed(0);
+            });
+            setPreTimerStarted(false);
             timer?.stop();
             setTimerStarted(false);
           }}
         >
           Stop
+        </button>
+      ) : (
+        <button
+          onClick={() => {
+            preTimer?.start();
+            setPreTimerStarted(true);
+          }}
+        >
+          Start
         </button>
       )}
     </>
