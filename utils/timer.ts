@@ -45,7 +45,7 @@ export class CountdownTimer {
   };
 
   start = () => {
-    this.stop();
+    this.stop(() => {});
 
     if (this.timestamps.length > 0) {
       this.startTimestamp = performance.now();
@@ -54,13 +54,14 @@ export class CountdownTimer {
     }
   };
 
-  stop = () => {
+  stop = (customCallback?: Callback) => {
     if (this.animationFrame) {
       window.cancelAnimationFrame(this.animationFrame);
       delete this.animationFrame;
     }
     this.totalElapsedTime = 0;
-    this.stopCallback?.();
+    if (customCallback) customCallback();
+    else this.stopCallback?.();
   };
 
   tick = () => {
