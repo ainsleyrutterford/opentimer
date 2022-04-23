@@ -38,9 +38,21 @@ const LabelledNumberInput = ({
   setState,
 }: LabelledNumberInputProps) => {
   return (
-    <div>
-      <label>{label} </label>
+    <div className="input-group" style={{ marginTop: 8 }}>
+      <span className="input-group-button">
+        <button
+          className="btn"
+          type="button"
+          disabled={true}
+          style={{ color: "var(--color-btn-text)" }}
+        >
+          {label}
+        </button>
+      </span>
       <input
+        className="form-control"
+        type="text"
+        aria-label={label}
         value={state}
         onKeyPress={(event) => {
           if (!/[0-9]/.test(event.key)) {
@@ -147,16 +159,29 @@ const Home: NextPage = () => {
   }, [lag, preTimerInput, targetFrame, frameHit]);
 
   return (
-    <>
+    <div
+      style={{
+        maxWidth: 450,
+        marginLeft: "auto",
+        marginRight: "auto",
+        padding: 16,
+      }}
+    >
       <DarkmodeToggle />
-      <br />
-      <br />
-      Pre Timer (s): {`${((preTimerInput - preTimeElapsed) / 1000).toFixed(
-        2
-      )}`}{" "}
-      <br />
-      Time (s): {`${((time - timeElapsed) / 1000).toFixed(2)}`} <br />
-      <br />
+      <div className="d-flex" style={{ gap: 16, marginBottom: 16 }}>
+        <div className="Box p-3 color-bg-subtle" style={{ width: "100%" }}>
+          <p className="text-bold">Pre-time (s)</p>
+          <p className="h2 m-0">
+            {`${((preTimerInput - preTimeElapsed) / 1000).toFixed(2)}`}
+          </p>
+        </div>
+        <div className="Box p-3 color-bg-subtle" style={{ width: "100%" }}>
+          <p className="text-bold">Time (s)</p>
+          <p className="h2 m-0">
+            {`${((time - timeElapsed) / 1000).toFixed(2)}`}
+          </p>
+        </div>
+      </div>
       <LabelledNumberInput label="Lag (ms)" state={lag} setState={setLag} />
       <LabelledNumberInput
         label="Pre-timer (ms)"
@@ -168,47 +193,58 @@ const Home: NextPage = () => {
         state={targetFrame}
         setState={setTargetFrame}
       />
-      <br />
       <LabelledNumberInput
         label="Frame hit"
         state={frameHit}
         setState={setFrameHit}
       />
       <br />
-      <button
-        onClick={() => {
-          if (frameHit !== 0) {
-            setLag(Math.round((targetFrame - frameHit) * GBA_FRAMERATE));
-          }
-        }}
-      >
-        Update
-      </button>
-      {timerStarted || preTimerStarted ? (
+      <div className="d-flex" style={{ gap: 16 }}>
         <button
+          className="btn btn-block"
+          type="button"
           onClick={() => {
-            preTimer?.stop(() => {
+            if (frameHit !== 0) {
+              setLag((currentLag) =>
+                Math.round(
+                  currentLag + (targetFrame - frameHit) * GBA_FRAMERATE
+                )
+              );
+            }
+          }}
+        >
+          Update
+        </button>
+        {timerStarted || preTimerStarted ? (
+          <button
+            className="btn btn-block"
+            type="button"
+            onClick={() => {
+              preTimer?.stop(() => {
+                setPreTimerStarted(false);
+                setPreTimeElapsed(0);
+              });
               setPreTimerStarted(false);
-              setPreTimeElapsed(0);
-            });
-            setPreTimerStarted(false);
-            timer?.stop();
-            setTimerStarted(false);
-          }}
-        >
-          Stop
-        </button>
-      ) : (
-        <button
-          onClick={() => {
-            preTimer?.start();
-            setPreTimerStarted(true);
-          }}
-        >
-          Start
-        </button>
-      )}
-    </>
+              timer?.stop();
+              setTimerStarted(false);
+            }}
+          >
+            Stop
+          </button>
+        ) : (
+          <button
+            className="btn btn-block"
+            type="button"
+            onClick={() => {
+              preTimer?.start();
+              setPreTimerStarted(true);
+            }}
+          >
+            Start
+          </button>
+        )}
+      </div>
+    </div>
   );
 };
 

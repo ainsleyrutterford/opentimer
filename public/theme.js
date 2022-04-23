@@ -1,9 +1,10 @@
 // Big thanks to: https://www.joshwcomeau.com/react/dark-mode/
 
 // The script seems to sometimes run twice. This makes sure it only runs the first time
-if (!document.documentElement.hasAttribute("color-mode")) {
+if (!document.documentElement.hasAttribute("data-color-mode")) {
   const getInitialColorMode = () => {
-    const localStorageColorMode = window.localStorage.getItem("color-mode");
+    const localStorageColorMode =
+      window.localStorage.getItem("data-color-mode");
     const hasStoragePreference = typeof localStorageColorMode === "string";
 
     // If the user has explicitly chosen light or dark, use it
@@ -23,5 +24,7 @@ if (!document.documentElement.hasAttribute("color-mode")) {
   };
 
   const colorMode = getInitialColorMode();
-  document.documentElement.setAttribute("color-mode", colorMode);
+  document.documentElement.setAttribute("data-color-mode", colorMode);
+  document.documentElement.setAttribute("data-light-theme", "light");
+  document.documentElement.setAttribute("data-dark-theme", "dark");
 }
