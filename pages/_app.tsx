@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import "../styles/global.css";
-
 import type { AppProps } from "next/app";
 import React, { createContext, useEffect, useState } from "react";
 
@@ -20,7 +17,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
   // Runs once on initial render. Gets the color mode from the HTML element.
   useEffect(() => {
     const initialColorMode =
-      document.documentElement.getAttribute("color-mode");
+      document.documentElement.getAttribute("data-color-mode");
     setColorMode(initialColorMode === "dark" ? "dark" : "light");
   }, []);
 
@@ -28,8 +25,8 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
   // the new value in local storage
   useEffect(() => {
     if (colorMode !== "") {
-      document.documentElement.setAttribute("color-mode", colorMode);
-      window.localStorage.setItem("color-mode", colorMode);
+      document.documentElement.setAttribute("data-color-mode", colorMode);
+      window.localStorage.setItem("data-color-mode", colorMode);
     }
   }, [colorMode]);
 

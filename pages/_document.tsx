@@ -18,6 +18,10 @@ class MyDocument extends Document {
       <Html lang="en-GB">
         <Head>
           {/* This is the default <head> for all pages across the website. */}
+          <link
+            href="https://unpkg.com/@primer/css@^19.0.0/dist/primer.css"
+            rel="stylesheet"
+          />
           <script id="theme" src="theme.js" />
           <link
             rel="icon"
