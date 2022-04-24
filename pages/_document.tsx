@@ -19,7 +19,7 @@ class MyDocument extends Document {
     return (
       <Html lang="en-GB">
         <Head>
-          {/* This is the default <head> for all pages across the website. */}
+          <title>opentimer</title>
           <link
             href="https://unpkg.com/@primer/css@^19.0.0/dist/primer.css"
             rel="stylesheet"
