@@ -1,10 +1,7 @@
+import "../styles/global.css";
+
 import type { AppProps } from "next/app";
 import React, { createContext, useEffect, useState } from "react";
-
-export enum Style {
-  LaTeX,
-  GitHub,
-}
 
 export const ThemeContext = createContext<{
   colorMode: string;

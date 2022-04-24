@@ -12,8 +12,9 @@
     "prettier": "npx prettier -c --ignore-path .eslintignore .",
     "generate": "node utils/generate.mjs",
     "fix-fonts": "source utils/fix-local-fonts.sh",
-    "build-electron": "NODE_ENV=dev npm run build && NODE_ENV=dev npm run export && tsc --outDir out utils/electron.ts && npm run fix-fonts",
-    "electron": "electron out/electron.js"
+    "build-electron": "NODE_ENV=dev npm run build && NODE_ENV=dev npm run export && tsc --outDir out utils/electron.ts && npm run fix-fonts && cp package.json out/",
+    "electron": "electron out/electron.js",
+    "package-electron": "npx electron-packager out --overwrite --icon utils/macOS-icon.icns --out electron"
   },
   "dependencies": {
     "howler": "^2.2.3",

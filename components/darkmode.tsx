@@ -15,7 +15,6 @@ export const DarkmodeToggle = () => {
         display: "block",
         marginLeft: "auto",
         marginBottom: 12,
-        marginTop: 32,
       }}
     >
       {colorMode === "dark" ? (
