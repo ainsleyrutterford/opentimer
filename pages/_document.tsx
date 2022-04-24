@@ -7,6 +7,8 @@ import Document, {
 } from "next/document";
 import React from "react";
 
+import { Favicons } from "../utils/favicons";
+
 class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
     const initialProps = await Document.getInitialProps(ctx);
@@ -23,10 +25,7 @@ class MyDocument extends Document {
             rel="stylesheet"
           />
           <script id="theme" src="theme.js" />
-          <link
-            rel="icon"
-            href={`/${process.env.NEXT_PUBLIC_REPO_NAME}/favicon.ico`}
-          />
+          <Favicons />
           {/* This meta should be put in the Head for each page as it will not be the
               same, whereas the two above are the same for all pages */}
           <meta
