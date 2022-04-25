@@ -61,5 +61,3 @@ export const PWAHead = () => (
     />
   </>
 );
-
-// #0d1117
