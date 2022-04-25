@@ -1,6 +1,7 @@
 import "../styles/global.css";
 
 import type { AppProps } from "next/app";
+import Head from "next/head";
 import React, { createContext, useEffect, useState } from "react";
 
 export const ThemeContext = createContext<{
@@ -29,6 +30,9 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
 
   return (
     <ThemeContext.Provider value={{ colorMode, setColorMode }}>
+      <Head>
+        <title>opentimer</title>
+      </Head>
       <Component {...pageProps} />
     </ThemeContext.Provider>
   );
