@@ -8,6 +8,7 @@ import Document, {
 import React from "react";
 
 import { Favicons } from "../utils/favicons";
+import { PWAHead } from "../utils/pwa";
 
 class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
@@ -19,19 +20,17 @@ class MyDocument extends Document {
     return (
       <Html lang="en-GB">
         <Head>
-          <title>opentimer</title>
+          <meta
+            name="description"
+            content="A timer used for RNG manipulation in Pokémon games"
+          />
+          <Favicons />
+          <PWAHead />
           <link
             href="https://unpkg.com/@primer/css@^19.0.0/dist/primer.css"
             rel="stylesheet"
           />
           <script id="theme" src="theme.js" />
-          <Favicons />
-          {/* This meta should be put in the Head for each page as it will not be the
-              same, whereas the two above are the same for all pages */}
-          <meta
-            name="description"
-            content="A timer used for RNG manipulation in Pokémon games"
-          />
         </Head>
         <body>
           <Main />
