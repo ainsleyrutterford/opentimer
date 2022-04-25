@@ -47,50 +47,6 @@ export const Favicons = () => (
       sizes="16x16"
       href={`/${process.env.NEXT_PUBLIC_REPO_NAME}/favicons/favicon-16.png`}
     />
-    <link
-      rel="apple-touch-icon"
-      href={`/${process.env.NEXT_PUBLIC_REPO_NAME}/favicons/favicon-57.png`}
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="114x114"
-      href={`/${process.env.NEXT_PUBLIC_REPO_NAME}/favicons/favicon-114.png`}
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="72x72"
-      href={`/${process.env.NEXT_PUBLIC_REPO_NAME}/favicons/favicon-72.png`}
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="144x144"
-      href={`/${process.env.NEXT_PUBLIC_REPO_NAME}/favicons/favicon-144.png`}
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="60x60"
-      href={`/${process.env.NEXT_PUBLIC_REPO_NAME}/favicons/favicon-60.png`}
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="120x120"
-      href={`/${process.env.NEXT_PUBLIC_REPO_NAME}/favicons/favicon-120.png`}
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="76x76"
-      href={`/${process.env.NEXT_PUBLIC_REPO_NAME}/favicons/favicon-76.png`}
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="152x152"
-      href={`/${process.env.NEXT_PUBLIC_REPO_NAME}/favicons/favicon-152.png`}
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href={`/${process.env.NEXT_PUBLIC_REPO_NAME}/favicons/favicon-180.png`}
-    />
     <meta name="msapplication-TileColor" content="#FFFFFF" />
     <meta
       name="msapplication-TileImage"
